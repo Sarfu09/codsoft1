@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Unbeatable Tic-Tac-Toe AI</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background:linear-gradient(to right, #74ebd5, #acb6e5);
+      height: 100vh;
+      justify-content: center;
+      margin: 0;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 10px;
+    }
+    .cell {
+      background-color: #fff;
+      border-radius: 10px;
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      transition: background 0.2s ease;
+    }
+    .cell:hover {
+      background-color: yellow;
+    }
+    #status {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #333;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tic-Tac-Toe: AI vs YOU</h1>
+  <div id="board"></div>
+  <div id="status">Your turn (X)</div>
+  <button onclick="resetGame()">Restart Game</button>
+
+  <script>
+    const boardEl = document.getElementById('board');
+    const statusEl = document.getElementById('status');
+    let board = Array(9).fill('');
+    let isGameOver = false;
+
+    const human = 'X';
+    const ai = 'O';
+
+    function createBoard() {
+      boardEl.innerHTML = '';
+      board.forEach((val, idx) => {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.dataset.index = idx;
+        cell.innerText = val;
+        cell.addEventListener('click', humanMove);
+        boardEl.appendChild(cell);
+      });
+    }
+
+    function humanMove(e) {
+      const idx = e.target.dataset.index;
+      if (board[idx] === '' && !isGameOver) {
+        board[idx] = human;
+        updateBoard();
+        if (!checkWinner(human)) {
+          aiMove();
+        }
+      }
+    }
+
+    function aiMove() {
+      const best = minimax(board, ai);
+      board[best.index] = ai;
+      updateBoard();
+      checkWinner(ai);
+    }
+
+    function minimax(newBoard, player) {
+      const availSpots = newBoard.map((v, i) => v === '' ? i : null).filter(i => i !== null);
+
+      if (checkWin(newBoard, human)) return { score: -10 };
+      if (checkWin(newBoard, ai)) return { score: 10 };
+      if (availSpots.length === 0) return { score: 0 };
+
+      const moves = [];
+      for (let i = 0; i < availSpots.length; i++) {
+        const move = {};
+        move.index = availSpots[i];
+        newBoard[availSpots[i]] = player;
+
+        if (player === ai) {
+          const result = minimax(newBoard, human);
+          move.score = result.score;
+        } else {
+          const result = minimax(newBoard, ai);
+          move.score = result.score;
+        }
+
+        newBoard[availSpots[i]] = '';
+        moves.push(move);
+      }
+
+      let bestMove;
+      if (player === ai) {
+        let bestScore = -Infinity;
+        moves.forEach((m, i) => {
+          if (m.score > bestScore) {
+            bestScore = m.score;
+            bestMove = i;
+          }
+        });
+      } else {
+        let bestScore = Infinity;
+        moves.forEach((m, i) => {
+          if (m.score < bestScore) {
+            bestScore = m.score;
+            bestMove = i;
+          }
+        });
+      }
+
+      return moves[bestMove];
+    }
+
+    function checkWin(bd, player) {
+      const winCombos = [
+        [0,1,2], [3,4,5], [6,7,8],
+        [0,3,6], [1,4,7], [2,5,8],
+        [0,4,8], [2,4,6]
+      ];
+      return winCombos.some(combo => combo.every(i => bd[i] === player));
+    }
+
+    function checkWinner(player) {
+      if (checkWin(board, player)) {
+        statusEl.innerText = player === human ? "You win! 🎉" : "AI wins! 🤖";
+        isGameOver = true;
+        return true;
+      } else if (!board.includes('')) {
+        statusEl.innerText = "It's a draw! 🤝";
+        isGameOver = true;
+        return true;
+      }
+      statusEl.innerText = player === human ? "AI's turn (O)" : "Your turn (X)";
+      return false;
+    }
+
+    function updateBoard() {
+      document.querySelectorAll('.cell').forEach((cell, idx) => {
+        cell.innerText = board[idx];
+      });
+    }
+
+    function resetGame() {
+      board = Array(9).fill('');
+      isGameOver = false;
+      statusEl.innerText = "Your turn (X)";
+      createBoard();
+    }
+
+    createBoard();
+  </script>
+</body>
+</html>
