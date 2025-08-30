@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chatbot</title>
+    <style>
+        /* Basic styling for the chat interface */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #chat-container {
+            width: 400px;
+            height: 600px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chat-header {
+            background-color: #075e54;
+            color: white;
+            padding: 15px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        
+        #chat-box {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-color: #e5ddd5;
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 70%;
+            line-height: 1.4;
+        }
+
+        .user-message {
+            background-color: #dcf8c6;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message {
+            background-color: #fff;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        #user-input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+
+        #message-input {
+            flex-grow: 1;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            padding: 10px 15px;
+            font-size: 1em;
+            outline: none;
+        }
+
+        #send-btn {
+            background-color: #128c7e;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #send-btn:hover {
+            background-color: #075e54;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="chat-container">
+        <div id="chat-header">Simple Rule-Bot 🤖</div>
+        <div id="chat-box">
+            <div class="message bot-message">Hello! How can I help you today?</div>
+        </div>
+        <div id="user-input-container">
+            <input type="text" id="message-input" placeholder="Type a message...">
+            <button id="send-btn">&#10148;</button>
+        </div>
+    </div>
+
+    <script>
+        // Get references to HTML elements
+        const chatBox = document.getElementById('chat-box');
+        const messageInput = document.getElementById('message-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        // Function to handle sending a message
+        function handleSendMessage() {
+            const userInput = messageInput.value.trim();
+            if (userInput === "") return; // Don't send empty messages
+
+            // Display user's message
+            appendMessage(userInput, 'user-message');
+            
+            // Get and display bot's response
+            const botResponse = getBotResponse(userInput);
+            
+            // Simulate bot thinking time
+            setTimeout(() => {
+                appendMessage(botResponse, 'bot-message');
+            }, 500);
+
+
+            // Clear the input field
+            messageInput.value = "";
+        }
+
+        // Function to append a message to the chat box
+        function appendMessage(message, className) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', className);
+            messageElement.textContent = message;
+            chatBox.appendChild(messageElement);
+            // Scroll to the latest message
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        
+        // Function to generate a bot response based on rules
+        function getBotResponse(input) {
+            const lowerInput = input.toLowerCase();
+
+            // Predefined rules using if-else statements
+            if (lowerInput.includes('hello') || lowerInput.includes('hi')) {
+                return 'Hello there! 👋 How can I assist you?';
+            } else if (lowerInput.includes('how are you')) {
+                return "I'm a bot, so I'm always running perfectly! Thanks for asking.";
+            } else if (lowerInput.includes('your name')) {
+                return "I am a simple Rule-Bot, created to demonstrate basic chat logic.";
+            } else if (lowerInput.includes('help')) {
+                return "You can ask me questions like 'How are you?' or tell me your name.";
+            } else if (lowerInput.includes('time')) {
+                return `The current time is ${new Date().toLocaleTimeString()}. ⏰`;
+            } else if (lowerInput.includes('bye') || lowerInput.includes('goodbye')) {
+                return 'Goodbye! Have a great day. 😊';
+            } else {
+                // Default response if no rule matches
+                return "Sorry, I didn't understand that. Please try asking something else.";
+            }
+        }
+
+        // Event Listeners
+        sendBtn.addEventListener('click', handleSendMessage);
+        messageInput.addEventListener('keypress', function(event) {
+            // Check if the key pressed was 'Enter'
+            if (event.key === 'Enter') {
+                handleSendMessage();
+            }
+        });
+    </script>
+
+</body>
+</html>
